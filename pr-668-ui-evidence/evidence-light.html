@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>PR #668 生命周期徽章 — 界面效果证据</title>
+<style>
+  /* 以下 CSS 变量取值直接转录自 apps/desktop/src/renderer/themes/colors.ts 的
+     registerColor 定义(双模式 token,与线上渲染一致):
+     surface-chip / warning-accent / error-fg / text-primary / text-secondary /
+     text-tertiary / border-default / surface-hover-soft / background */
+  :root {
+    --surface-chip: #e5e5e5;
+    --warning-accent: #EA6B17;
+    --error-fg: #dc2626;
+    --text-primary: #262626;
+    --text-secondary: #737373;
+    --text-tertiary: #a3a3a3;
+    --border-default: #d7d7d4;
+    --background: hsl(0 0% 100%);
+    color-scheme: light;
+  }
+  [data-theme="dark"] {
+    --surface-chip: #3c3c3a;
+    --warning-accent: #EA6B17;
+    --error-fg: #f87171;
+    --text-primary: #d4d4d4;
+    --text-secondary: #a3a3a3;
+    --text-tertiary: #737373;
+    --border-default: #3c3c3a;
+    --background: hsl(60 3% 14%);
+    color-scheme: dark;
+  }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--background);
+    font-family: -apple-system, "PingFang SC", "Segoe UI", sans-serif;
+    color: var(--text-primary);
+  }
+  h2 { font-size: 14px; margin: 24px 0 8px; }
+  .panel { display: flex; flex-direction: column; gap: 8px; max-width: 560px; }
+
+  /* GhostPluginCard 行结构转录(apps/desktop/src/renderer/features/plugin/GhostPluginPage.tsx) */
+  .card {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--border-default); border-radius: 12px; padding: 12px;
+  }
+  .icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-chip);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .meta { min-width: 0; flex: 1; }
+  .title-row { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+  .sub-row { margin-top: 4px; font-size: 11px; color: var(--text-tertiary); }
+  .desc { margin-top: 6px; font-size: 13px; line-height: 20px; color: var(--text-secondary); }
+
+  /* GhostReadinessBadge 1:1 转录(apps/desktop/src/renderer/features/plugin/GhostReadinessBadge.tsx):
+     rounded-full px-2 py-0.5 text-10 font-medium leading-4
+     warning: bg --surface-chip / text --warning-accent
+     error:   bg --surface-chip / text --error-fg */
+  .badge {
+    flex-shrink: 0; user-select: none;
+    border-radius: 9999px; padding: 2px 8px;
+    font-size: 10px; font-weight: 500; line-height: 16px;
+    background: var(--surface-chip);
+  }
+  .badge.warning { color: var(--warning-accent); }
+  .badge.error { color: var(--error-fg); }
+
+  /* 市场卡片按钮(同文件,installable 时文案「安装」,否则「详情」+ ChevronRight) */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; height: 32px;
+    border: 1px solid var(--border-default); border-radius: 8px; padding: 0 12px;
+    font-size: 12px; font-weight: 500; color: var(--text-primary);
+    background: transparent; flex-shrink: 0;
+  }
+  /* 详情页头部「作者 · 版本」行内嵌徽章(GhostPluginDetailView.tsx:223 trailing) */
+  .detail-author { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<h2>插件列表卡 — readiness 徽章(ready 不渲染)</h2>
+<div class="panel">
+  <div class="card">
+    <div class="icon">🔍</div>
+    <div class="meta">
+      <div class="title-row">Web Search <span class="badge warning">待配置</span></div>
+      <div class="sub-row">官方 · v1.2.0</div>
+      <div class="desc">联网搜索,Brave / Tavily 双引擎</div>
+    </div>
+    <button class="btn">详情 ›</button>
+  </div>
+  <div class="card">
+    <div class="icon">🔍</div>
+    <div class="meta">
+      <div class="title-row">Web Search <span class="badge error">需重新授权</span></div>
+      <div class="sub-row">官方 · v1.2.0</div>
+      <div class="desc">凭证被拒自动翻转(401 记账 → needs_reauth)</div>
+    </div>
+    <button class="btn">详情 ›</button>
+  </div>
+  <div class="card">
+    <div class="icon">🎮</div>
+    <div class="meta">
+      <div class="title-row">TapTap Maker</div>
+      <div class="sub-row">官方 · v0.9.1</div>
+      <div class="desc">ready 常态,不渲染徽章(与旧 UI 口径一致)</div>
+    </div>
+    <button class="btn">详情 ›</button>
+  </div>
+</div>
+
+<h2>市场卡片 — 未安装项按钮「详情」→「安装」</h2>
+<div class="panel">
+  <div class="card">
+    <div class="icon">📦</div>
+    <div class="meta">
+      <div class="title-row">Linear Sync</div>
+      <div class="sub-row">社区 · v2.0.3</div>
+      <div class="desc">未安装的市场插件,按钮直达安装(改动前为「详情 ›」)</div>
+    </div>
+    <button class="btn">安装</button>
+  </div>
+</div>
+
+<h2>详情页头部 — 「作者 · 版本」行内嵌徽章(与文本同基线)</h2>
+<div class="panel">
+  <div class="card">
+    <div class="meta">
+      <div class="title-row" style="font-size:16px">Web Search</div>
+      <div class="detail-author" style="margin-top:6px">Cindy 官方 · v1.2.0 <span class="badge warning">待配置</span></div>
+    </div>
+  </div>
+</div>
+
+<h2>徽章全色板(四种非 ready 态)</h2>
+<div class="panel" style="flex-direction:row;gap:12px;align-items:center">
+  <span class="badge warning">待配置</span>
+  <span class="badge error">需重新授权</span>
+  <span class="badge error">运行异常</span>
+  <span class="badge warning">状态未知</span>
+</div>
+
+</body>
+</html>
